@@ -12,18 +12,26 @@ struct ArticlesListView: View {
     let articles: [Article]
     @State private var selectedArticle: Article?
     
+    @State var navigateToDetails = false // navigation to detail news screen
+
     var body: some View {
+        VStack {
         List {
             ForEach(articles) { article in
                 CustomArticleRowView(article: article)
                     .onTapGesture {
                         selectedArticle = article
+                        self.navigateToDetails.toggle()
                     }
             }
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+            
+            NavigationLink("", destination: NewsDetailView(article: $selectedArticle), isActive: self.$navigateToDetails)
+
+    }
     }
 }
 
