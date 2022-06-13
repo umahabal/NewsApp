@@ -13,10 +13,7 @@ struct NewListView: View {
 
     
     var body: some View {
-        
-
         NavigationView {
-
             ArticlesListView(articles: articles)
                 .overlay(overlayView)
                 .task(id: articleNewsVM.fetchTaskToken, loadTask)
@@ -24,8 +21,6 @@ struct NewListView: View {
 
                 .navigationTitle(articleNewsVM.fetchTaskToken.country.text)
                 .navigationBarItems(trailing: menu)
-
-
         }
     }
     

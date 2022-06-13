@@ -23,16 +23,12 @@ struct NewsAPIManager {
     func fetch(from country: Country) async throws -> [Article] {
         try await fetchArticles(from: generateNewsURL(from: country))
     }
-    
-    func search(for query: String) async throws -> [Article] {
-        try await fetchArticles(from: generateSearchURL(from: query))
-    }
-    
+        
     private func fetchArticles(from url: URL) async throws -> [Article] {
         let (data, response) = try await session.data(from: url)
         
         guard let response = response as? HTTPURLResponse else {
-            throw generateError(description: "Bad Response")
+            throw generateError(description: APIError.decodingError.errorDescription!)
         }
         
         switch response.statusCode {
@@ -42,10 +38,10 @@ struct NewsAPIManager {
             if apiResponse.status == "ok" {
                 return apiResponse.articles ?? []
             } else {
-                throw generateError(description: apiResponse.message ?? "An error occured")
+                throw generateError(description: (apiResponse.message ?? APIError.unknown.errorDescription)!)
             }
         default:
-            throw generateError(description: "A server error occured")
+            throw generateError(description: APIError.errorCode(response.statusCode).errorDescription!)
         }
     }
     
@@ -53,14 +49,6 @@ struct NewsAPIManager {
         NSError(domain: "NewsAPI", code: code, userInfo: [NSLocalizedDescriptionKey: description])
     }
     
-    private func generateSearchURL(from query: String) -> URL {
-        let percentEncodedString = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        var url = "https://newsapi.org/v2/everything?"
-        url += "apiKey=\(apiKey)"
-        url += "&language=en"
-        url += "&q=\(percentEncodedString)"
-        return URL(string: url)!
-    }
     
     private func generateNewsURL(from country: Country) -> URL {
         var url = "https://newsapi.org/v2/top-headlines?"
